@@ -31,22 +31,50 @@ var data: Record<string, {earthRadius: number, orbitAu: number}|{earthRadius: nu
   // 'test2': {earthRadius: 1, orbitKm: kmPerEarthRadius},
 };
 
-function format(basePerEarthDiameter: number) {
+function compute(basePerEarthDiameter: number, verbose = true) {
   const basePerEarthRadius = basePerEarthDiameter / 2;
-  const ret = {};
+  const ret: Record<string, {orbitBase: number, diameterBase: number, text: string}> = {};
   for (const [k, v] of Object.entries(data)) {
     const orbitKm = 'orbitKm' in v ? v.orbitKm : (v.orbitAu * kmPerAu);
     const orbitBase = orbitKm / kmPerEarthRadius * basePerEarthRadius;
     const diameterBase = v.earthRadius * basePerEarthRadius * 2;
-    console.log(
-        `${k} - ${diameterBase.toFixed(3)} meters diameter - ${orbitBase.toFixed(3)} meters away from orbit center`)
+    const text =
+        `### ${k} - ${diameterBase.toFixed(3)} meters diameter - ${orbitBase.toFixed(3)} meters away from orbit center`;
+    ret[k] = {orbitBase, diameterBase, text};
+    if (verbose) { console.log(text); }
   }
+  return ret;
 }
 
 if (module === require.main) {
-  // format(11.7) // earth diameter = 1 house = 11.7
-  // format(1 / 109.3);        // sun diameter = 1
-  format(1 / 109.3 * 11.7); // sun diameter = 1 house = 11.7 m
-  // format(1 / 109.3 * 76.3); // sun diameter = 1 street = 76.3 m
-  // format(1 / 10.97 * 11.7); // Jupiter diameter = 1 house = 11.7 m
+  const ticks = "```";
+  console.log(`# planet-house
+What if our house was the size of planet Earth? And if the center of the Sun was in our driveway?
+
+## Answer
+
+View the map at **https://fasiha.github.io/planet-house**!
+
+${Object.values(compute(11.7, false)).map(o => o.text).join('\n\n')}
+
+## Dev
+If you want to mess with the code to generate the data above and the [website](https://fasiha.github.io/planet-house), make sure you have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) (any version) installed. Then, in your command-line application (Terminal, xterm, Command Prompt), run the following:
+${ticks}
+git checkout https://github.com/fasiha/planet-house
+cd planet-house
+npm install
+npm run build
+npm run run
+${ticks}
+
+Exercise for the reader:
+- center the map at your lat/lon (YOUR_HOME_LON_LAT in index.html)
+- change house big your house is (HOUSE_SIZE_METERS in index.ts)
+`);
+  const HOUSE_SIZE_METERS = 11.7;
+  compute(HOUSE_SIZE_METERS) // earth diameter = 1 house = 11.7
+  // compute(1 / 109.3);        // sun diameter = 1
+  // compute(1 / 109.3 * 11.7); // sun diameter = 1 house = 11.7 m
+  // compute(1 / 109.3 * 76.3); // sun diameter = 1 street = 76.3 m
+  // compute(1 / 10.97 * 11.7); // Jupiter diameter = 1 house = 11.7 m
 }

@@ -1,18 +1,19 @@
 {
-  "name": "planets-scale",
+  "name": "planet-house",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
     "@types/node": "^14.10.1",
-    "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
   },
   "devDependencies": {},
   "scripts": {
+    "build": "tsc -p .",
+    "run": "node index.js > README.md",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "Unlicense"
 }
