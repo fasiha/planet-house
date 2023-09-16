@@ -1,6 +1,6 @@
 <!-- https://bl.ocks.org/altocumulus/0fefcd64ca84319643b56ee9e722407f -->
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Planet House</title>
 <style>
   .stroke {
@@ -44,64 +44,77 @@
 <script src="index.js"></script>
 <script>
   var computed = compute(11.7);
+  var solarSystem = Object.values(computed);
 
-  d3.select('div#content')
-    .selectAll('p')
+  d3.select("div#content")
+    .selectAll("p")
     .data(Object.values(computed))
     .enter()
-    .append('p')
-    .text(t => t.text);
+    .append("p")
+    .text((t) => t.text);
 
   var YOUR_HOME_LON_LAT = [-75, 40.5]; // this is around NYC
   var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-  var projection = d3.geoAzimuthalEquidistant()
+  var projection = d3
+    .geoAzimuthalEquidistant()
     .scale((width - 3) / (2 * Math.PI))
     .translate([width / 2, height / 2])
-    .rotate(YOUR_HOME_LON_LAT.map(x => -x));
+    .rotate(YOUR_HOME_LON_LAT.map((x) => -x));
 
-  var path = d3.geoPath()
-    .projection(projection);
+  var path = d3.geoPath().projection(projection);
 
   var EARTH_RADIUS_KM = 6371;
 
-  var circle = d3.geoCircle()
+  var circle = d3
+    .geoCircle()
     .center(YOUR_HOME_LON_LAT)
-    .radius(radiusMeter => radiusMeter * 1e-3 / EARTH_RADIUS_KM * 180 / Math.PI);
+    .radius(
+      (radiusMeter) =>
+        (((radiusMeter * 1e-3) / EARTH_RADIUS_KM) * 180) / Math.PI
+    );
 
-  svg.append("defs").append("path")
+  svg
+    .append("defs")
+    .append("path")
     .datum({ type: "Sphere" })
     .attr("id", "sphere")
     .attr("d", path);
 
-  svg.append("use")
-    .attr("class", "stroke")
-    .attr("xlink:href", "#sphere");
+  svg.append("use").attr("class", "stroke").attr("xlink:href", "#sphere");
 
-  svg.append("use")
-    .attr("class", "fill")
-    .attr("xlink:href", "#sphere");
+  svg.append("use").attr("class", "fill").attr("xlink:href", "#sphere");
 
   d3.json("https://unpkg.com/world-atlas@1/world/50m.json")
     .then(function (world) {
-      svg.insert("path", ".graticule")
+      svg
+        .insert("path", ".graticule")
         .datum(topojson.feature(world, world.objects.land))
         .attr("class", "land")
         .attr("d", path);
 
-      svg.insert("path", ".graticule")
-        .datum(topojson.mesh(world, world.objects.countries, function (a, b) { return a !== b; }))
+      svg
+        .insert("path", ".graticule")
+        .datum(
+          topojson.mesh(world, world.objects.countries, function (a, b) {
+            return a !== b;
+          })
+        )
         .attr("class", "boundary")
         .attr("d", path);
-    }).then(() => {
-      svg.selectAll(".circle")
-        .data(Object.values(computed).map(o => o.orbitBase))
-        .enter().append("path")
+    })
+    .then(() => {
+      svg
+        .selectAll(".circle")
+        .data(solarSystem.map((o) => o.orbitBase))
+        .enter()
+        .append("path")
         .datum(circle)
         .attr("class", "circle")
-        .attr("d", path);
+        .attr("d", path)
+        .append("svg:title")
+        .text((_d, i) => solarSystem[i].title);
     });
-
 </script>
