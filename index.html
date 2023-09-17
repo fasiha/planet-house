@@ -34,19 +34,25 @@
     stroke: black;
     fill-opacity: 0;
   }
-  .circle .invisible {
+  .invisible * {
     stroke: transparent;
+    fill: transparent;
   }
 </style>
 
-<label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" value="0" /></label>
-<label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" value="0" /></label>
-<label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" value="0" /></label>
+<div>
+  <label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" value="0" /></label>
+  <label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" value="0" /></label>
+  <label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" value="0" /></label>
+</div>
 
-<br />
 <div id="content"></div>
+
 <svg width="960" height="960"></svg>
-<a href="https://github.com/fasiha/planet-house">Source code</a>
+
+<p>
+  <a href="https://github.com/fasiha/planet-house">Source code</a>
+</p>
 
 <script src="https://d3js.org/d3.v5.js"></script>
 <script src="https://unpkg.com/topojson-client@2"></script>
@@ -111,6 +117,7 @@
       .enter()
       .append("g")
       .attr("class", "circle-group")
+      .attr("id", (d, i) => "group-" + solarSystem[i].title.split(" ")[0])
       .each(function (d, i) {
         const circlePath = d3.select(this).append("path").attr("class", "circle");
         const labelText = d3.select(this).append("text").attr("class", "label");
@@ -140,7 +147,7 @@
   }
 
   var [lon, lat, rot] = [-75, 40.5, 0];
-  draw(lon, lat, rot);
+  draw(lon, lat, rot).then(() => showSelected());
 
   const [lonElement, latElement, rotElement] = ["#lon", "#lat", "#rot"].map((q) => document.querySelector(q));
 
@@ -179,6 +186,18 @@
     }
   }
 
+  function showSelected() {
+    for (const row of solarSystemReactive.data) {
+      const id = "#group-" + row.title.split(" ")[0];
+      const node = document.querySelector(id);
+      if (!node) continue;
+      const classes = node.classList;
+      if (row.selected) classes.remove("invisible");
+      else classes.add("invisible");
+    }
+  }
+  watch(showSelected);
+
   const buttonDiameter = html`<button
     @click="${() => {
       if (tableSort.diameter === true) tableSort.ascending = !tableSort.ascending;
@@ -216,12 +235,15 @@
           (row) =>
             html`<tr>
               <td>
-                <input
-                  type="checkbox"
-                  checked="${() => row.selected}"
-                  @change="${() => (row.selected = !row.selected)}"
-                />
-                ${row.title}
+                <label for="${() => "check-" + row.title.split(" ")[0]}">
+                  <input
+                    id="${() => "check-" + row.title.split(" ")[0]}"
+                    type="checkbox"
+                    checked="${() => row.selected}"
+                    @change="${() => (row.selected = !row.selected)}"
+                  />
+                  ${row.title}</label
+                >
               </td>
               <td>${noMegaMeters(row.diameterBase)}</td>
               <td>${noMegaMeters(row.orbitBase)}</td>
