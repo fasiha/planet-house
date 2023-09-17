@@ -45,9 +45,11 @@
 <div id="content"></div>
 
 <div id="controls">
-  <label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" value="0" /></label>
-  <label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" value="0" /></label>
-  <label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" value="0" /></label>
+  <!-- values will be set by JS later, when we connect -->
+  <label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" /></label>
+  <label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" /></label>
+  <label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" /></label>
+  <label for="scale">Scale: <input id="scale" type="number" min="-0.5" max="4" step="0.1" /></label>
 </div>
 
 <svg width="960" height="960"></svg>
@@ -69,7 +71,7 @@
 
   const worldPromise = d3.json("https://unpkg.com/world-atlas@1/world/50m.json");
 
-  async function draw(lon, lat, rot = 0) {
+  async function draw(lon, lat, rot = 0, scale = 1) {
     var svg = d3.select("svg"),
       width = +svg.attr("width"),
       height = +svg.attr("height");
@@ -81,7 +83,7 @@
 
     var projection = d3
       .geoAzimuthalEquidistant()
-      .scale((width - 3) / (2 * Math.PI))
+      .scale(((width - 3) / (2 * Math.PI)) * Math.pow(10, scale))
       .translate([width / 2, height / 2])
       .rotate([-lon, -lat, rot]);
 
@@ -143,28 +145,36 @@
           .attr("dy", 15)
           .text(solarSystem[i].title);
       });
+    showSelected();
   }
 
-  var [lon, lat, rot] = [-75, 40.5, 0];
-  draw(lon, lat, rot).then(() => showSelected());
+  var [lon, lat, rot, scale] = [-75, 40.5, 0, 0];
+  draw(lon, lat, rot, scale);
 
-  const [lonElement, latElement, rotElement] = ["#lon", "#lat", "#rot"].map((q) => document.querySelector(q));
+  const [lonElement, latElement, rotElement, scaleElement] = ["#lon", "#lat", "#rot", "#scale"].map((q) =>
+    document.querySelector(q)
+  );
 
   lonElement.value = lon;
   latElement.value = lat;
   rotElement.value = rot;
+  scaleElement.value = scale;
 
   lonElement.addEventListener("change", (e) => {
     lon = +e.target.value;
-    draw(lon, lat, rot);
+    draw(lon, lat, rot, scale);
   });
   latElement.addEventListener("change", (e) => {
     lat = +e.target.value;
-    draw(lon, lat, rot);
+    draw(lon, lat, rot, scale);
   });
   rotElement.addEventListener("change", (e) => {
     rot = +e.target.value;
-    draw(lon, lat, rot);
+    draw(lon, lat, rot, scale);
+  });
+  scaleElement.addEventListener("change", (e) => {
+    scale = +e.target.value;
+    draw(lon, lat, rot, scale);
   });
 
   // arrow.js: Table
