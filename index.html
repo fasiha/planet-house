@@ -22,11 +22,13 @@
 
   .land {
     fill: #222;
+    stroke: red;
+    fill: white;
   }
 
   .boundary {
     fill: none;
-    stroke: #fff;
+    stroke: salmon;
     stroke-width: 0.5px;
   }
 
@@ -40,13 +42,13 @@
   }
 </style>
 
-<div>
+<div id="content"></div>
+
+<div id="controls">
   <label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" value="0" /></label>
   <label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" value="0" /></label>
   <label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" value="0" /></label>
 </div>
-
-<div id="content"></div>
 
 <svg width="960" height="960"></svg>
 
@@ -97,8 +99,6 @@
       .insert("path", ".graticule")
       .datum(topojson.feature(world, world.objects.land))
       .attr("class", "land")
-      .style("stroke", "red")
-      .style("fill", "white")
       .attr("d", path);
 
     svg
@@ -109,7 +109,6 @@
         })
       )
       .attr("class", "boundary")
-      .style("stroke", "salmon")
       .attr("d", path);
     svg
       .selectAll(".circle")
