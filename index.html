@@ -36,15 +36,25 @@
     fill-opacity: 0;
   }
 </style>
+
+<label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" value="0" /></label>
+<label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" value="0" /></label>
+<label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" value="0" /></label>
+
+<br />
 <svg width="960" height="960"></svg>
 <div id="content"></div>
 <a href="https://github.com/fasiha/planet-house">Source code</a>
+
 <script src="https://d3js.org/d3.v5.js"></script>
 <script src="https://unpkg.com/topojson-client@2"></script>
 <script src="index.js"></script>
 <script>
+  var EARTH_RADIUS_KM = 6371;
   var computed = compute(11.7);
   var solarSystem = Object.values(computed);
+
+  const worldPromise = d3.json("https://unpkg.com/world-atlas@1/world/50m.json");
 
   d3.select("div#content")
     .selectAll("p")
@@ -53,93 +63,100 @@
     .append("p")
     .text((t) => t.text);
 
-  var YOUR_HOME_LON_LAT = [-75, 40.5]; // this is around NYC
-  var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+  async function draw(lon, lat, rot = 0) {
+    var svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
 
-  var projection = d3
-    .geoAzimuthalEquidistant()
-    .scale((width - 3) / (2 * Math.PI))
-    .translate([width / 2, height / 2])
-    .rotate(YOUR_HOME_LON_LAT.map((x) => -x));
+    d3.select("svg").selectAll("*").remove();
 
-  var path = d3.geoPath().projection(projection);
+    svg.append("use").attr("class", "stroke").attr("xlink:href", "#sphere");
+    svg.append("use").attr("class", "fill").attr("xlink:href", "#sphere");
 
-  var EARTH_RADIUS_KM = 6371;
+    var projection = d3
+      .geoAzimuthalEquidistant()
+      .scale((width - 3) / (2 * Math.PI))
+      .translate([width / 2, height / 2])
+      .rotate([-lon, -lat, rot]);
 
-  var circle = d3
-    .geoCircle()
-    .center(YOUR_HOME_LON_LAT)
-    .radius(
-      (radiusMeter) =>
-        (((radiusMeter * 1e-3) / EARTH_RADIUS_KM) * 180) / Math.PI
-    );
+    var path = d3.geoPath().projection(projection);
 
-  svg
-    .append("defs")
-    .append("path")
-    .datum({ type: "Sphere" })
-    .attr("id", "sphere")
-    .attr("d", path);
+    svg.append("defs").append("path").datum({ type: "Sphere" }).attr("id", "sphere").attr("d", path);
 
-  svg.append("use").attr("class", "stroke").attr("xlink:href", "#sphere");
+    var circle = d3
+      .geoCircle()
+      .center([lon, lat])
+      .radius((radiusMeter) => (((radiusMeter * 1e-3) / EARTH_RADIUS_KM) * 180) / Math.PI);
 
-  svg.append("use").attr("class", "fill").attr("xlink:href", "#sphere");
+    const world = await worldPromise;
+    svg
+      .insert("path", ".graticule")
+      .datum(topojson.feature(world, world.objects.land))
+      .attr("class", "land")
+      .style("stroke", "red")
+      .style("fill", "white")
+      .attr("d", path);
 
-  d3.json("https://unpkg.com/world-atlas@1/world/50m.json")
-    .then(function (world) {
-      svg
-        .insert("path", ".graticule")
-        .datum(topojson.feature(world, world.objects.land))
-        .attr("class", "land")
-        .style("stroke", "red")
-        .style("fill", "white")
-        .attr("d", path);
+    svg
+      .insert("path", ".graticule")
+      .datum(
+        topojson.mesh(world, world.objects.countries, function (a, b) {
+          return a !== b;
+        })
+      )
+      .attr("class", "boundary")
+      .style("stroke", "salmon")
+      .attr("d", path);
+    svg
+      .selectAll(".circle")
+      .data(solarSystem.map((o) => o.orbitBase))
+      .enter()
+      .append("g")
+      .attr("class", "circle-group")
+      .each(function (d, i) {
+        const circlePath = d3.select(this).append("path").attr("class", "circle");
+        const labelText = d3.select(this).append("text").attr("class", "label");
 
-      svg
-        .insert("path", ".graticule")
-        .datum(
-          topojson.mesh(world, world.objects.countries, function (a, b) {
-            return a !== b;
-          })
-        )
-        .attr("class", "boundary")
-        .style("stroke", "salmon")
-        .attr("d", path);
-    })
-    .then(() => {
-      svg
-        .selectAll(".circle")
-        .data(solarSystem.map((o) => o.orbitBase))
-        .enter()
-        .append("g")
-        .attr("class", "circle-group")
-        .each(function (d, i) {
-          const circlePath = d3
-            .select(this)
-            .append("path")
-            .attr("class", "circle");
-          const labelText = d3
-            .select(this)
-            .append("text")
-            .attr("class", "label");
+        circlePath.datum(circle).attr("d", path);
 
-          circlePath.datum(circle).attr("d", path);
+        const [cx, cy] = path.centroid(circlePath.datum());
+        if (!(isFinite(cx) && isFinite(cy))) {
+          return;
+        }
+        const { width } = circlePath.node().getBBox();
+        const radius = width / 2;
 
-          const [cx, cy] = path.centroid(circlePath.datum());
-          const { width } = circlePath.node().getBBox();
-          const radius = width / 2;
+        const textX = cx;
+        const textY = cy + radius;
 
-          const textX = cx;
-          const textY = cy + radius;
+        labelText
+          .attr("x", textX)
+          .attr("y", textY)
+          .attr("text-anchor", "middle")
+          .attr("dy", 15)
+          .text(solarSystem[i].title);
+      });
+  }
 
-          labelText
-            .attr("x", textX)
-            .attr("y", textY)
-            .attr("text-anchor", "middle")
-            .attr("dy", 15)
-            .text(solarSystem[i].title);
-        });
-    });
+  var [lon, lat, rot] = [-75, 40.5, 0];
+  draw(lon, lat, rot);
+
+  const [lonElement, latElement, rotElement] = ["#lon", "#lat", "#rot"].map((q) => document.querySelector(q));
+
+  lonElement.value = lon;
+  latElement.value = lat;
+  rotElement.value = rot;
+
+  lonElement.addEventListener("change", (e) => {
+    lon = +e.target.value;
+    draw(lon, lat, rot);
+  });
+  latElement.addEventListener("change", (e) => {
+    lat = +e.target.value;
+    draw(lon, lat, rot);
+  });
+  rotElement.addEventListener("change", (e) => {
+    rot = +e.target.value;
+    draw(lon, lat, rot);
+  });
 </script>
