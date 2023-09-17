@@ -3,6 +3,57 @@
 <meta charset="utf-8" />
 <title>Planet House</title>
 <style>
+  body {
+    padding: 0 10px;
+    font: 30px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    color: #444;
+  }
+
+  input {
+    font: 30px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+  input[type="checkbox"] {
+    transform: scale(2);
+  }
+
+  h1,
+  h2,
+  h3 {
+    line-height: 1.2;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      color: #c9d1d9;
+      background: #0d1117;
+    }
+
+    a:link {
+      color: #58a6ff;
+    }
+
+    a:visited {
+      color: #8e96f0;
+    }
+  }
+
+  svg {
+    width: min(100vw, 100vh);
+    height: min(100vw, 100vh);
+  }
+  svg.maximize {
+    width: max(100vw, 100vh);
+    height: max(100vw, 100vh);
+  }
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
   .stroke {
     fill: none;
     stroke: #000;
@@ -40,16 +91,51 @@
     stroke: transparent;
     fill: transparent;
   }
+
+  table,
+  td,
+  th {
+    border: 0.5px solid gray;
+    border-collapse: collapse;
+    padding: 0.25rem;
+  }
 </style>
 
+<h1>Planet House</h1>
+<p>
+  So! If the earth was the size of our house, and our street was the center of the Solar System, how far away would the
+  earth be? And how big and far away would other Solar System objects be?
+</p>
+<p>Answer (assuming your house is a 12 meter tall three-story condo, and assuming average orbit radii)—</p>
 <div id="content"></div>
 
+<h2>Map</h2>
+<p>
+  This is an azimuthal equidistant projection centered (close to) our street. So you can see that on average, with the
+  center of the Solar System in New Jersey, USA, Jupiter's average orbit would take it through Ohio, and Eris' average
+  orbit would take it through Argentina, Egypt, almost to Hokkaido!
+</p>
+<p>You can move the center of the Solar System to your street using the controls below:</p>
 <div id="controls">
   <!-- values will be set by JS later, when we connect -->
-  <label for="lon">Longitude (°): <input id="lon" type="number" min="-180" max="180" /></label>
-  <label for="lat">Latitude (°): <input id="lat" type="number" min="-90" max="90" /></label>
-  <label for="rot">Rotate (°): <input id="rot" type="number" min="0" max="360" /></label>
-  <label for="scale">Scale: <input id="scale" type="number" min="-0.5" max="4" step="0.1" /></label>
+  <label for="lon">
+    <input id="lon" type="range" min="-180" max="180" />
+    <input type="number" min="-180" max="180" id="lon-value" /> Longitude (°)</label
+  >
+  <label for="lat">
+    <input id="lat" type="range" min="-90" max="90" />
+    <input type="number" min="-90" max="90" id="lat-value" /> Latitude (°)</label
+  >
+  <label for="rot">
+    <input id="rot" type="range" min="0" max="360" />
+    <input type="number" min="0" max="360" id="rot-value" /> Rotate (°)</label
+  >
+  <label for="scale">
+    <input id="scale" type="range" min="-0.5" max="4" step="0.025" />
+    <input type="number" min="-0.5" max="4" step="0.025" id="scale-value" />
+    Scale</label
+  >
+  <label for="maximize"><input id="maximize" type="checkbox" /> Maximize</label>
 </div>
 
 <svg width="960" height="960"></svg>
@@ -63,18 +149,16 @@
 <script src="index.js"></script>
 <script type="module">
   import { reactive, html, watch } from "https://esm.sh/@arrow-js/core";
-  // Start your app here!
 
   var EARTH_RADIUS_KM = 6371;
-  var computed = compute(11.7);
-  var solarSystem = Object.values(computed);
+  var solarSystem = Object.values(compute(11.7)); // from index.js --> index.ts
 
   const worldPromise = d3.json("https://unpkg.com/world-atlas@1/world/50m.json");
 
   async function draw(lon, lat, rot = 0, scale = 1) {
-    var svg = d3.select("svg"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height");
+    var svg = d3.select("svg");
+    var width = +svg.node().clientWidth;
+    var height = +svg.node().clientHeight;
 
     d3.select("svg").selectAll("*").remove();
 
@@ -142,7 +226,7 @@
           .attr("x", textX)
           .attr("y", textY)
           .attr("text-anchor", "middle")
-          .attr("dy", 15)
+          .attr("dy", 30)
           .text(solarSystem[i].title);
       });
     showSelected();
@@ -151,29 +235,49 @@
   var [lon, lat, rot, scale] = [-75, 40.5, 0, 0];
   draw(lon, lat, rot, scale);
 
-  const [lonElement, latElement, rotElement, scaleElement] = ["#lon", "#lat", "#rot", "#scale"].map((q) =>
-    document.querySelector(q)
-  );
+  const [lonElement, latElement, rotElement, scaleElement, maximizeElement] = [
+    "#lon",
+    "#lat",
+    "#rot",
+    "#scale",
+    "#maximize",
+  ].map((q) => document.querySelector(q));
 
-  lonElement.value = lon;
-  latElement.value = lat;
-  rotElement.value = rot;
-  scaleElement.value = scale;
+  lonElement.textContent = lon;
+  latElement.textContent = lat;
+  rotElement.textContent = rot;
+  scaleElement.textContent = scale;
 
-  lonElement.addEventListener("change", (e) => {
+  document.querySelector("#lon-value").value = lon;
+  document.querySelector("#lat-value").value = lat;
+  document.querySelector("#rot-value").value = rot;
+  document.querySelector("#scale-value").value = scale;
+
+  lonElement.addEventListener("input", (e) => {
     lon = +e.target.value;
     draw(lon, lat, rot, scale);
+    document.querySelector("#lon-value").value = lon;
   });
-  latElement.addEventListener("change", (e) => {
+  latElement.addEventListener("input", (e) => {
     lat = +e.target.value;
     draw(lon, lat, rot, scale);
+    document.querySelector("#lat-value").value = lat;
   });
-  rotElement.addEventListener("change", (e) => {
+  rotElement.addEventListener("input", (e) => {
     rot = +e.target.value;
     draw(lon, lat, rot, scale);
+    document.querySelector("#rot-value").value = rot;
   });
-  scaleElement.addEventListener("change", (e) => {
+  scaleElement.addEventListener("input", (e) => {
     scale = +e.target.value;
+    draw(lon, lat, rot, scale);
+    document.querySelector("#scale-value").value = scale;
+  });
+
+  maximizeElement.addEventListener("change", (e) => {
+    const classes = document.querySelector("svg").classList;
+    if (e.target.checked) classes.add("maximize");
+    else classes.remove("maximize");
     draw(lon, lat, rot, scale);
   });
 
@@ -216,7 +320,7 @@
       resort();
     }}"
   >
-    ${() => (tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
+    ${() => (tableSort.diameter ? (tableSort.ascending ? "↑" : "↓") : "×")}
   </button>`;
   const buttonOrbit = html`<button
     @click="${() => {
@@ -227,15 +331,15 @@
       resort();
     }}"
   >
-    ${() => (!tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
+    ${() => (!tableSort.diameter ? (tableSort.ascending ? "↑" : "↓") : "×")}
   </button>`;
 
   const table = html`<table>
     <thead>
       <tr>
-        <td>Object</td>
-        <td>Diameter ${() => buttonDiameter}</td>
-        <td>Orbit distance ${() => buttonOrbit}</td>
+        <th>Object</th>
+        <th>Diameter ${() => buttonDiameter}</th>
+        <th>Orbit distance ${() => buttonOrbit}</th>
       </tr>
     </thead>
     <tbody>
