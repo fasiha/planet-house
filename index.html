@@ -61,74 +61,6 @@
 
   const worldPromise = d3.json("https://unpkg.com/world-atlas@1/world/50m.json");
 
-  const tableSort = reactive({
-    diameter: true,
-    ascending: false,
-  });
-  const solarSystemReactive = reactive({
-    data: solarSystem.map((o) => ({ ...o, selected: !o.title.includes(" ") })),
-  });
-
-  function resort() {
-    if (tableSort.diameter) {
-      solarSystemReactive.data.sort((a, b) => (a.diameterBase - b.diameterBase) * (tableSort.ascending ? 1 : -1));
-    } else {
-      solarSystemReactive.data.sort((a, b) => (a.orbitBase - b.orbitBase) * (tableSort.ascending ? 1 : -1));
-    }
-  }
-
-  const buttonDiameter = html`<button
-    @click="${() => {
-      if (tableSort.diameter === true) tableSort.ascending = !tableSort.ascending;
-      else tableSort.ascending = false;
-
-      tableSort.diameter = true;
-      resort();
-    }}"
-  >
-    ${() => (tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
-  </button>`;
-  const buttonOrbit = html`<button
-    @click="${() => {
-      if (tableSort.diameter === false) tableSort.ascending = !tableSort.ascending;
-      else tableSort.ascending = false;
-
-      tableSort.diameter = false;
-      resort();
-    }}"
-  >
-    ${() => (!tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
-  </button>`;
-
-  const table = html`<table>
-    <thead>
-      <tr>
-        <td>Object</td>
-        <td>Diameter ${() => buttonDiameter}</td>
-        <td>Orbit distance ${() => buttonOrbit}</td>
-      </tr>
-    </thead>
-    <tbody>
-      ${() =>
-        solarSystemReactive.data.map(
-          (row) =>
-            html`<tr>
-              <td>
-                <input
-                  type="checkbox"
-                  checked="${() => row.selected}"
-                  @change="${() => (row.selected = !row.selected)}"
-                />
-                ${row.title}
-              </td>
-              <td>${noMegaMeters(row.diameterBase)}</td>
-              <td>${noMegaMeters(row.orbitBase)}</td>
-            </tr>`
-        )}
-    </tbody>
-  </table>`;
-  table(document.querySelector("#content"));
-
   async function draw(lon, lat, rot = 0) {
     var svg = d3.select("svg"),
       width = +svg.attr("width"),
@@ -228,4 +160,74 @@
     rot = +e.target.value;
     draw(lon, lat, rot);
   });
+
+  // arrow.js: Table
+
+  const tableSort = reactive({
+    diameter: true,
+    ascending: false,
+  });
+  const solarSystemReactive = reactive({
+    data: solarSystem.map((o) => ({ ...o, selected: !o.title.includes(" ") })),
+  });
+
+  function resort() {
+    if (tableSort.diameter) {
+      solarSystemReactive.data.sort((a, b) => (a.diameterBase - b.diameterBase) * (tableSort.ascending ? 1 : -1));
+    } else {
+      solarSystemReactive.data.sort((a, b) => (a.orbitBase - b.orbitBase) * (tableSort.ascending ? 1 : -1));
+    }
+  }
+
+  const buttonDiameter = html`<button
+    @click="${() => {
+      if (tableSort.diameter === true) tableSort.ascending = !tableSort.ascending;
+      else tableSort.ascending = false;
+
+      tableSort.diameter = true;
+      resort();
+    }}"
+  >
+    ${() => (tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
+  </button>`;
+  const buttonOrbit = html`<button
+    @click="${() => {
+      if (tableSort.diameter === false) tableSort.ascending = !tableSort.ascending;
+      else tableSort.ascending = false;
+
+      tableSort.diameter = false;
+      resort();
+    }}"
+  >
+    ${() => (!tableSort.diameter ? (tableSort.ascending ? "v" : "^") : "?")}
+  </button>`;
+
+  const table = html`<table>
+    <thead>
+      <tr>
+        <td>Object</td>
+        <td>Diameter ${() => buttonDiameter}</td>
+        <td>Orbit distance ${() => buttonOrbit}</td>
+      </tr>
+    </thead>
+    <tbody>
+      ${() =>
+        solarSystemReactive.data.map(
+          (row) =>
+            html`<tr>
+              <td>
+                <input
+                  type="checkbox"
+                  checked="${() => row.selected}"
+                  @change="${() => (row.selected = !row.selected)}"
+                />
+                ${row.title}
+              </td>
+              <td>${noMegaMeters(row.diameterBase)}</td>
+              <td>${noMegaMeters(row.orbitBase)}</td>
+            </tr>`
+        )}
+    </tbody>
+  </table>`;
+  table(document.querySelector("#content"));
 </script>
