@@ -69,7 +69,7 @@
   }
 
   .fill {
-    fill: #fff;
+    fill: lightblue;
   }
 
   .graticule {
@@ -80,9 +80,8 @@
   }
 
   .land {
-    fill: #222;
-    stroke: red;
-    fill: white;
+    stroke: black;
+    fill: lightgreen;
   }
 
   .boundary {
@@ -98,27 +97,6 @@
   .invisible * {
     stroke: transparent;
     fill: transparent;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .fill,
-    .land {
-      fill: #000;
-    }
-    .land,
-    .boundary {
-      stroke: salmon;
-    }
-    .circle {
-      stroke: #c9d1d9;
-    }
-    .label {
-      fill: #c9d1d9;
-    }
-    .invisible * {
-      stroke: transparent;
-      fill: transparent;
-    }
   }
 
   table,
@@ -301,6 +279,26 @@
     scale = +e.target.value;
     draw(lon, lat, rot, scale);
     document.querySelector("#scale-value").value = scale;
+  });
+  document.querySelector("#lon-value").addEventListener("change", (e) => {
+    lon = +e.target.value;
+    draw(lon, lat, rot, scale);
+    lonElement.value = lon;
+  });
+  document.querySelector("#lat-value").addEventListener("change", (e) => {
+    lat = +e.target.value;
+    draw(lon, lat, rot, scale);
+    latElement.value = lat;
+  });
+  document.querySelector("#rot-value").addEventListener("change", (e) => {
+    rot = +e.target.value;
+    draw(lon, lat, rot, scale);
+    rotElement.value = rot;
+  });
+  document.querySelector("#scale-value").addEventListener("change", (e) => {
+    scale = +e.target.value;
+    draw(lon, lat, rot, scale);
+    scaleElement.value = scale;
   });
 
   maximizeElement.addEventListener("change", (e) => {
