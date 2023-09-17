@@ -31,7 +31,7 @@
   }
 
   .circle {
-    stroke: red;
+    stroke: black;
     /* fill: red; */
     fill-opacity: 0;
   }
@@ -93,6 +93,8 @@
         .insert("path", ".graticule")
         .datum(topojson.feature(world, world.objects.land))
         .attr("class", "land")
+        .style("stroke", "red")
+        .style("fill", "white")
         .attr("d", path);
 
       svg
@@ -103,6 +105,7 @@
           })
         )
         .attr("class", "boundary")
+        .style("stroke", "salmon")
         .attr("d", path);
     })
     .then(() => {
@@ -110,11 +113,33 @@
         .selectAll(".circle")
         .data(solarSystem.map((o) => o.orbitBase))
         .enter()
-        .append("path")
-        .datum(circle)
-        .attr("class", "circle")
-        .attr("d", path)
-        .append("svg:title")
-        .text((_d, i) => solarSystem[i].title);
+        .append("g")
+        .attr("class", "circle-group")
+        .each(function (d, i) {
+          const circlePath = d3
+            .select(this)
+            .append("path")
+            .attr("class", "circle");
+          const labelText = d3
+            .select(this)
+            .append("text")
+            .attr("class", "label");
+
+          circlePath.datum(circle).attr("d", path);
+
+          const [cx, cy] = path.centroid(circlePath.datum());
+          const { width } = circlePath.node().getBBox();
+          const radius = width / 2;
+
+          const textX = cx;
+          const textY = cy + radius;
+
+          labelText
+            .attr("x", textX)
+            .attr("y", textY)
+            .attr("text-anchor", "middle")
+            .attr("dy", 15)
+            .text(solarSystem[i].title);
+        });
     });
 </script>
