@@ -5,15 +5,16 @@
 <style>
   body {
     padding: 0 10px;
-    font: 30px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    font: 20px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
       sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     color: #444;
   }
 
   input {
-    font: 30px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+    font: 20px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
       sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
+
   input[type="checkbox"] {
     transform: scale(2);
   }
@@ -39,13 +40,20 @@
     }
   }
 
+  @media screen and (max-width: 1115px) {
+    body,
+    input {
+      font: 38px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    }
+  }
+
   svg {
     width: min(100vw, 100vh);
     height: min(100vw, 100vh);
   }
   svg.maximize {
-    width: max(100vw, 100vh);
-    height: max(100vw, 100vh);
+    width: 100vw;
+    height: 100vh;
   }
   #controls {
     display: flex;
@@ -90,6 +98,27 @@
   .invisible * {
     stroke: transparent;
     fill: transparent;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .fill,
+    .land {
+      fill: #000;
+    }
+    .land,
+    .boundary {
+      stroke: salmon;
+    }
+    .circle {
+      stroke: #c9d1d9;
+    }
+    .label {
+      fill: #c9d1d9;
+    }
+    .invisible * {
+      stroke: transparent;
+      fill: transparent;
+    }
   }
 
   table,
