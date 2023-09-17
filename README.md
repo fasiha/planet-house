@@ -36,10 +36,13 @@ View the map at **https://fasiha.github.io/planet-house**!
 | Makemake | 1.31m | 6,290.2km | Makemake and Haumea pretty similar in that they'd both be about the size of a grade schooler—Makemake is ten centimeters shorter—and are super-far away from the Sun. If Pluto is in Alaska/Peru/England, and Haumea in northern Alaska/southern Peru/France, then Makemake is out in Russia, or by the Peruvian–Chilean border, or at the French–German border. Still not as far away as Eris (out in Egypt, or Argentina, or Hokkaido). |
 | Ceres | 0.868m | 379.9km | Ceres is our first asteroid! She's littler than a kindergartener, and between Mars (Baltimore or Rhode Island) and Jupiter (Columbus) with all the other members of the Asterid Belt: in western Pennsylvania, or New Hamshire, or north Virginia. |
 
+The map on the [site](https://fasiha.github.io/planet-house) is an azimuthal equidistant projection centered near our place in New Jersey. You can use the sliders to move the center of the solar system to your neighborhood!
+
+![Map](map.png)
 
 ## Dev
 
-If you want to mess with the code to generate the data above and the [website](https://fasiha.github.io/planet-house), make sure you have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) (any version) installed. Then, in your command-line application (Terminal, xterm, Command Prompt), run the following:
+If you want to mess with the code to generate the data above and the [website](https://fasiha.github.io/planet-house), make sure you have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) (any version) installed. Then, in your [command-line](https://www.freecodecamp.org/news/how-to-use-the-cli-beginner-guide/) application (Terminal, xterm, Command Prompt), run the following:
 
 ```
 git checkout https://github.com/fasiha/planet-house
@@ -49,7 +52,4 @@ npm run build
 npm run run
 ```
 
-Exercise for the reader:
-
-- center the map at your lat/lon (YOUR_HOME_LON_LAT in index.html)
-- change house big your house is (HOUSE_SIZE_METERS in index.ts)
+Now you can open `index.html` and see the table and the map.
