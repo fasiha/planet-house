@@ -32,8 +32,10 @@
 
   .circle {
     stroke: black;
-    /* fill: red; */
     fill-opacity: 0;
+  }
+  .circle .invisible {
+    stroke: transparent;
   }
 </style>
 
@@ -63,7 +65,9 @@
     diameter: true,
     ascending: false,
   });
-  const solarSystemReactive = reactive({ data: solarSystem });
+  const solarSystemReactive = reactive({
+    data: solarSystem.map((o) => ({ ...o, selected: !o.title.includes(" ") })),
+  });
 
   function resort() {
     if (tableSort.diameter) {
@@ -109,7 +113,14 @@
         solarSystemReactive.data.map(
           (row) =>
             html`<tr>
-              <td>${row.title}</td>
+              <td>
+                <input
+                  type="checkbox"
+                  checked="${() => row.selected}"
+                  @change="${() => (row.selected = !row.selected)}"
+                />
+                ${row.title}
+              </td>
               <td>${noMegaMeters(row.diameterBase)}</td>
               <td>${noMegaMeters(row.orbitBase)}</td>
             </tr>`
@@ -172,7 +183,10 @@
         const circlePath = d3.select(this).append("path").attr("class", "circle");
         const labelText = d3.select(this).append("text").attr("class", "label");
 
-        circlePath.datum(circle).attr("d", path);
+        circlePath
+          .datum(circle)
+          .attr("d", path)
+          .attr("id", "circle-" + solarSystem[i].title.split(" ")[0]);
 
         const [cx, cy] = path.centroid(circlePath.datum());
         if (!(isFinite(cx) && isFinite(cy))) {
