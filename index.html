@@ -106,6 +106,9 @@
     border-collapse: collapse;
     padding: 0.25rem;
   }
+  button {
+    width: 2rem;
+  }
 </style>
 
 <h1>Planet House</h1>
@@ -114,7 +117,144 @@
   earth be? And how big and far away would other Solar System objects be?
 </p>
 <p>Answer (assuming your house is a 12 meter tall three-story condo, and assuming average orbit radii)—</p>
-<div id="content"></div>
+<div id="content">
+  <table>
+    <thead>
+      <tr>
+        <th>Object</th>
+        <th>Diameter <button>?</button></th>
+        <th>Orbit distance <button>?</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="checkbox" /> Sun</td>
+        <td>1.3km</td>
+        <td>0m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Jupiter</td>
+        <td>128m</td>
+        <td>714.8km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Saturn</td>
+        <td>107m</td>
+        <td>1,310.1km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Uranus</td>
+        <td>46.6m</td>
+        <td>2,636.2km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Neptune</td>
+        <td>45.2m</td>
+        <td>4,130.4km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Earth</td>
+        <td>11.7m</td>
+        <td>137.4km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Venus</td>
+        <td>11.1m</td>
+        <td>99.4km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Mars</td>
+        <td>6.22m</td>
+        <td>209.3km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Ganymede (Jupiter III)</td>
+        <td>4.84m</td>
+        <td>983m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Titan (Saturn VI)</td>
+        <td>4.72m</td>
+        <td>1.1km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Mercury</td>
+        <td>4.48m</td>
+        <td>53.2km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Callisto (Jupiter IV)</td>
+        <td>4.43m</td>
+        <td>1.7km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Io (Jupiter I)</td>
+        <td>3.35m</td>
+        <td>387m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Moon (Luna)</td>
+        <td>3.19m</td>
+        <td>353m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Europa (Jupiter II)</td>
+        <td>2.87m</td>
+        <td>616m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Triton (Neptune I)</td>
+        <td>2.49m</td>
+        <td>326m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Pluto</td>
+        <td>2.19m</td>
+        <td>5,423.4km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Eris</td>
+        <td>2.14m</td>
+        <td>9,295.2km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Titania (Uranus III)</td>
+        <td>1.45m</td>
+        <td>400m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Haumea</td>
+        <td>1.4m</td>
+        <td>5,952.7km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Rhea (Saturn V)</td>
+        <td>1.4m</td>
+        <td>484m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Oberon (Uranus IV)</td>
+        <td>1.4m</td>
+        <td>536m</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Iapetus (Saturn VIII)</td>
+        <td>1.35m</td>
+        <td>3.3km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Makemake</td>
+        <td>1.31m</td>
+        <td>6,290.2km</td>
+      </tr>
+      <tr>
+        <td><input type="checkbox" /> Ceres</td>
+        <td>0.868m</td>
+        <td>379.9km</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <h2>Map</h2>
 <p>
@@ -391,5 +531,7 @@
         )}
     </tbody>
   </table>`;
-  table(document.querySelector("#content"));
+  const content = document.querySelector("#content");
+  content.innerHTML = "";
+  table(content);
 </script>
